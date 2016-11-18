@@ -59,11 +59,22 @@ public class DBConnection {
 	}
 	
 	public void updateJob(String InstanceId, String Schedule, String Status){
-		try {
-			conn.createStatement().execute("UPDATE jobStatus SET InstanceId='" + InstanceId + "', Status='" + Status + "' WHERE Schedule='" + Schedule + "'");
-			logger.info("Updated data");
-		} catch (SQLException e) {
-			e.printStackTrace();
+		Job job = queryJob(InstanceId);
+		
+		if (job.getInstanceId().equals("")){
+			try {
+				conn.createStatement().execute("UPDATE jobStatus SET InstanceId='" + InstanceId + "', Status='" + Status + "' WHERE Schedule='" + Schedule + "'");
+				logger.info("Updated data by schedule");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				conn.createStatement().execute("UPDATE jobStatus SET Status='" + Status + "' WHERE InstanceId='" + InstanceId + "'");
+				logger.info("Updated data by instanceId");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -76,16 +87,20 @@ public class DBConnection {
 		
 			ResultSet rs = st.executeQuery("SELECT * FROM jobStatus WHERE InstanceId='" + instanceID + "'");
 	
-			rs.next();
-	
-			String instanceId = rs.getString("InstanceId");
-			String schedule = rs.getString("Schedule");
-			String status = rs.getString("Status");
-			
-			job.setInstanceId(instanceId);
-			job.setSchedule(schedule);
-			job.setStatus(status);
-			logger.info("Query executed");
+			if (rs.next()){
+				String instanceId = rs.getString("InstanceId");
+				String schedule = rs.getString("Schedule");
+				String status = rs.getString("Status");
+				
+				job.setInstanceId(instanceId);
+				job.setSchedule(schedule);
+				job.setStatus(status);
+				logger.info("Query executed");
+			}else{
+				job.setInstanceId("");
+				job.setSchedule("");
+				job.setStatus("");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
