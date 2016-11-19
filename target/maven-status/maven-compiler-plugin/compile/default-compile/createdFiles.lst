@@ -1,4 +1,4 @@
 br/com/nubank/pojos/Job.class
-br/com/nubank/helpers/UpdateListener.class
 br/com/nubank/database/DBConnection.class
 br/com/nubank/Provisioner.class
+br/com/nubank/listener/UpdateListener.class

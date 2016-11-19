@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
@@ -20,11 +20,11 @@ public class UpdateListener {
 	private static Logger logger = Logger.getLogger(UpdateListener.class);
 	
 	public void updateJob(DBConnection db){
-		AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
+		AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		
 		logger.info("Receiving messages from sqs_update");
-		String myQueueUrl = "https://us-west-2.queue.amazonaws.com/678982507510/sqs_update";
+		String myQueueUrl = System.getenv("SQS_UPDATE_URL");
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(myQueueUrl);
         
         while(true){

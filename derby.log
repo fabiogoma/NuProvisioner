@@ -1,13 +1,13 @@
 ----------------------------------------------------------------
-Fri Nov 18 21:37:18 BRST 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-79cd-279c-00001c5c77d8 
-on database directory /home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nuprovisioner/nudatabase with class loader sun.misc.Launcher$AppClassLoader@4e0e2f2a 
-Loaded from file:/home/fabiom/.m2/repository/org/apache/derby/derby/10.13.1.1/derby-10.13.1.1.jar
+Sat Nov 19 13:18:55 BRST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-7d2b-3c06-000016fdf480 
+on database directory /home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nuprovisioner/nudatabase with class loader org.springframework.boot.loader.LaunchedURLClassLoader@72ea2f77 
+Loaded from jar:file:/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nuprovisioner/target/provisioner-0.0.1-SNAPSHOT.jar!/BOOT-INF/lib/derby-10.13.1.1.jar!/
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_111-b16
 user.dir=/home/fabiom/Documents/workspace-sts-3.8.2.RELEASE/nuprovisioner
 os.name=Linux
 os.arch=amd64
-os.version=4.8.6-201.fc24.x86_64
+os.version=4.8.7-200.fc24.x86_64
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

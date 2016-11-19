@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20160810</version><!--$NO-MVN-MAN-VER$-->
+			<version>20160810</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
@@ -41,5 +41,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

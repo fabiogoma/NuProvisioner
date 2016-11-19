@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
@@ -41,11 +41,11 @@ public class Provisioner {
     	JSONObject jsonObject = new JSONObject(payload);
     	String scheduler = jsonObject.toString();
     	
-    	AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
+    	AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		
 		logger.info("Sending message to queue sqs_launch");
-		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_launch", scheduler));
+		sqs.sendMessage(new SendMessageRequest(System.getenv("SQS_LAUNCH_URL"), scheduler));
     	
 		nuDb.insertJob("", "", jsonObject.getJSONObject("job").getString("schedule"), "requested");
     }
@@ -72,7 +72,7 @@ public class Provisioner {
     @RequestMapping(value = "/callback/{instanceId}", method = RequestMethod.DELETE)
     public void callback(@PathVariable("instanceId") String instanceId) {
         
-    	AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
+    	AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		
 		Job job = nuDb.queryJob(instanceId);
@@ -81,11 +81,11 @@ public class Provisioner {
     	String stringJob = jsonObject.toString();
 		
 		logger.info("Sending message to queue sqs_destroy");
-		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_destroy", stringJob));
+		sqs.sendMessage(new SendMessageRequest(System.getenv("SQS_DESTROY_URL"), stringJob));
 		
 		job.setStatus("done");
     	logger.info("Job is done, sending message to queue sqs_update");
-    	sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_update", stringJob));
+    	sqs.sendMessage(new SendMessageRequest(System.getenv("SQS_UPDATE_URL"), stringJob));
 
     }
 
