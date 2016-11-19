@@ -24,7 +24,7 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 import br.com.nubank.database.DBConnection;
-import br.com.nubank.helpers.UpdateListener;
+import br.com.nubank.listener.UpdateListener;
 import br.com.nubank.pojos.Job;
 
 
@@ -47,7 +47,7 @@ public class Provisioner {
 		logger.info("Sending message to queue sqs_launch");
 		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_launch", scheduler));
     	
-		nuDb.insertJob("", jsonObject.getJSONObject("job").getString("schedule"), "requested");
+		nuDb.insertJob("", "", jsonObject.getJSONObject("job").getString("schedule"), "requested");
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = "application/json")
@@ -75,15 +75,15 @@ public class Provisioner {
     	AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		
-		logger.info("Sending message to queue sqs_destroy");
-		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_destroy", instanceId));
-		
 		Job job = nuDb.queryJob(instanceId);
-    	job.setStatus("done");
-    	
-    	JSONObject jsonObject = new JSONObject(job);
-    	String stringJob  =jsonObject.toString();
-
+		
+		JSONObject jsonObject = new JSONObject(job);
+    	String stringJob = jsonObject.toString();
+		
+		logger.info("Sending message to queue sqs_destroy");
+		sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_destroy", stringJob));
+		
+		job.setStatus("done");
     	logger.info("Job is done, sending message to queue sqs_update");
     	sqs.sendMessage(new SendMessageRequest("https://us-west-2.queue.amazonaws.com/678982507510/sqs_update", stringJob));
 
