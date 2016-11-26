@@ -2,6 +2,7 @@ package br.com.nubank;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -19,9 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.util.EC2MetadataUtils;
 
 import br.com.nubank.database.DBConnection;
 import br.com.nubank.listener.UpdateListener;
@@ -40,6 +47,22 @@ public class Provisioner {
 
     	JSONObject jsonObject = new JSONObject(payload);
     	String scheduler = jsonObject.toString();
+    	
+    	AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withRegion(System.getenv("REGION")).build();
+    	
+    	DescribeInstancesResult result = ec2.describeInstances();
+    	
+    	List<Reservation> reservations = result.getReservations();
+
+        List<Instance> instances;
+        for(Reservation res : reservations){
+        	instances = res.getInstances();
+            for(Instance ins : instances){
+            	if (ins.getImageId().equals(EC2MetadataUtils.getInstanceId())) {
+            		jsonObject.put("PROVISIONER_IP", ins.getPublicIpAddress());
+            	}
+            }
+        }
     	
     	AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
