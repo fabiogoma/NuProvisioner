@@ -58,10 +58,11 @@ public class Provisioner {
         for(Reservation res : reservations){
         	instances = res.getInstances();
             for(Instance ins : instances){
-            	logger.info("Looping on instance: " + ins.getImageId());
-            	if (ins.getImageId().equals(EC2MetadataUtils.getInstanceId())) {
+            	if (ins.getInstanceId().equals(EC2MetadataUtils.getInstanceId())) {
             		logger.info("Current Public IP: " + ins.getPublicIpAddress());
-            		jsonObject.put("PROVISIONER_IP", ins.getPublicIpAddress());
+            		
+            		JSONObject jsonSchedule = jsonObject.getJSONObject("job");
+            		jsonSchedule.put("provisionerIP", ins.getPublicIpAddress());
             	}
             }
         }
