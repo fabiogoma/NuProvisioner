@@ -46,7 +46,6 @@ public class Provisioner {
     public void schedule(@RequestBody Map<String, Object> payload) throws JSONException, ParseException{
 
     	JSONObject jsonObject = new JSONObject(payload);
-    	String scheduler = jsonObject.toString();
     	
     	AmazonEC2 ec2 = AmazonEC2ClientBuilder.standard().withRegion(System.getenv("REGION")).build();
     	
@@ -54,16 +53,20 @@ public class Provisioner {
     	
     	List<Reservation> reservations = result.getReservations();
 
+    	logger.info("Current instance ID: " + EC2MetadataUtils.getInstanceId());
         List<Instance> instances;
         for(Reservation res : reservations){
         	instances = res.getInstances();
             for(Instance ins : instances){
+            	logger.info("Looping on instance: " + ins.getImageId());
             	if (ins.getImageId().equals(EC2MetadataUtils.getInstanceId())) {
+            		logger.info("Current Public IP: " + ins.getPublicIpAddress());
             		jsonObject.put("PROVISIONER_IP", ins.getPublicIpAddress());
             	}
             }
         }
     	
+        String scheduler = jsonObject.toString();
     	AWSCredentials credentials = new EnvironmentVariableCredentialsProvider().getCredentials();
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		
